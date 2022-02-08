@@ -6,54 +6,58 @@
 //
 
 import SwiftUI
-
-//struct ContentView: View {
-//    var body: some View {
-//        Text("Hello, world! This is a test!")
-//            .padding()
-//    }
-//}
-
+ 
 struct ContentView: View {
-
+    
+    @ObservedObject var bleManager = BLEManager()
+ 
     var body: some View {
         VStack (spacing: 10) {
-
+ 
             Text("Bluetooth Devices")
                 .font(.largeTitle)
                 .frame(maxWidth: .infinity, alignment: .center)
-            List() {
-                Text("placeholder 1")
-                Text("placeholder 2")
+            List(bleManager.peripherals) { peripheral in
+                HStack {
+                    Text(peripheral.name)
+                    Spacer()
+                    Text(String(peripheral.rssi))
+                }
             }.frame(height: 300)
-
+ 
             Spacer()
-
+ 
             Text("STATUS")
                 .font(.headline)
-
+ 
             // Status goes here
-            Text("Bluetooth status here")
-                .foregroundColor(.red)
-
+            if bleManager.isSwitchedOn {
+                Text("Bluetooth is switched on")
+                    .foregroundColor(.green)
+            }
+            else {
+                Text("Bluetooth is NOT switched on")
+                    .foregroundColor(.red)
+            }
+ 
             Spacer()
-
+ 
             HStack {
                 VStack (spacing: 10) {
                     Button(action: {
-                        print("Start Scanning")
+                        self.bleManager.startScanning()
                     }) {
                         Text("Start Scanning")
                     }
                     Button(action: {
-                        print("Stop Scanning")
+                        self.bleManager.stopScanning()
                     }) {
                         Text("Stop Scanning")
                     }
                 }.padding()
-
+ 
                 Spacer()
-
+ 
                 VStack (spacing: 10) {
                     Button(action: {
                         print("Start Advertising")
@@ -71,7 +75,7 @@ struct ContentView: View {
         }
     }
 }
-
+ 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
