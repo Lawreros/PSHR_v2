@@ -17,8 +17,7 @@ class BLEManager: NSObject, ObservableObject, CBCentralManagerDelegate {
     
     var myCentral: CBCentralManager!
     var heartRatePeripheral: CBPeripheral!
-    //@Published var isSwitchedOn = false
-    //@Published var peripherals = [Peripheral]()
+    @Published var datpack: Array<String> = ["n/a","n/a","n/a","n/a","n/a"]
     
         override init() {
             super.init()
@@ -64,7 +63,69 @@ class BLEManager: NSObject, ObservableObject, CBCentralManagerDelegate {
         heartRatePeripheral.discoverServices([heartRateServiceCBUUID])
     }
     
+    func onHeartRateReceived(_ heartRate: Array<Float>) {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss.SSSS"
+        let timestamp = formatter.string(from: Date())
+        print("BPM: \(heartRate[0])\t\(heartRate[1])\t\(heartRate[2])\t\(heartRate[3])")
+        Logger.log("BPM: \(heartRate[0])\t\(heartRate[1])\t\(heartRate[2])\t\(heartRate[3])", timestamp)
+        
+        datpack = [timestamp, String(heartRate[0]),String(heartRate[1]),String(heartRate[2]),String(heartRate[3])]
+        
+//        CurrentTime.text = timestamp
+//        heartRateLabel.text = String(heartRate[0])
+//        rrInterval1 = String(heartRate[1])
+//        rrInterval2 = String(heartRate[2])
+//        rrInterval3 = String(heartRate[3])
+    }
+    
+    
 }
+
+
+
+//MARK: - Text Logger
+
+func getDocumentsDirectory() -> URL {
+    //find all possible documents directories for this user
+    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+    
+    print(paths)
+    
+    //just send back the firs one, which ought to be the only one
+    return paths[0]
+}
+
+class Logger {
+
+    static var TextFile: URL? = {
+        guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd-MM-yyyy"
+        let dateString = formatter.string(from: Date())
+        let fileName = "\(dateString).txt"
+        return documentsDirectory.appendingPathComponent(fileName)
+    }()
+
+    static func log(_ message: String, _ timestamp: String) {
+        guard let textFile = TextFile else {
+            return
+        }
+        guard let data = (timestamp + ": " + message + "\n").data(using: String.Encoding.utf8) else { return }
+
+        if FileManager.default.fileExists(atPath: textFile.path) {
+            if let fileHandle = try? FileHandle(forWritingTo: textFile) {
+                fileHandle.seekToEndOfFile()
+                fileHandle.write(data)
+                fileHandle.closeFile()
+            }
+        } else {
+            try? data.write(to: textFile, options: .atomicWrite)
+        }
+    }
+}
+
+//MARK: - Peripheral Functionality
 
 extension BLEManager: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
@@ -98,7 +159,7 @@ extension BLEManager: CBPeripheralDelegate {
         switch characteristic.uuid {
         case heartRateMeasurementCharacteristicCBUUID:
             let data = heartRate(from: characteristic)
-            //onHeartRateReceived(data)
+            onHeartRateReceived(data)
         default:
             print("Unhandled Characteristic UUID: \(characteristic.uuid)")
         }
@@ -107,8 +168,26 @@ extension BLEManager: CBPeripheralDelegate {
     //Deciphers the incomming data into usable numbers
     private func heartRate(from characteristic: CBCharacteristic) -> Array<Float> {
         guard let characteristicData = characteristic.value else {return [-1]}
-        print("badump")
-        return [0,0,0,0]
+        let byteArray = [UInt8](characteristicData)
+        
+        let firstBitValue = byteArray[0] & 0x01
+        if firstBitValue == 0 {
+            // Heart Rate Value Format is in the 2nd byte
+            let size = byteArray.count
+            if size == 4{
+                return[Float(byteArray[1]),Float(Int(byteArray[3])<<8 + Int(byteArray[2]))/1.024,0,0]
+            }
+            if size == 6{
+                return[Float(byteArray[1]),Float(Int(byteArray[3])<<8 + Int(byteArray[2]))/1.024,Float(Int(byteArray[5])<<8 + Int(byteArray[4]))/1.024,0]
+            }
+            if size == 8{
+                return[Float(byteArray[1]),Float(Int(byteArray[3])<<8 + Int(byteArray[2]))/1.024,Float(Int(byteArray[5])<<8 + Int(byteArray[4]))/1.024,Float(Int(byteArray[7])<<8 + Int(byteArray[6]))/1.024]
+            }
+            return [0,0,0,0]
+        } else {
+            // Heart Rate Value Format is in the 2nd and 3rd bytes
+            return [(Float(Int(byteArray[1]) << 8)) + Float(Int(byteArray[2])), 23]
+        }
     }
     
 }

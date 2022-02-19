@@ -12,8 +12,15 @@ struct ContentView: View {
     @ObservedObject var bleManager = BLEManager()
     
     var body: some View {
-        Text("Hello, world! This is a test!to")
-            .padding()
+        //Text("Hello, world! This is a test!to")
+//        .padding
+        HStack{
+            Text(bleManager.datpack[0])
+            Text(bleManager.datpack[1])
+            Text(bleManager.datpack[2])
+            Text(bleManager.datpack[3])
+            Text(bleManager.datpack[4])
+        }
     }
 }
 
