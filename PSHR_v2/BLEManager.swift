@@ -41,7 +41,6 @@ class BLEManager: NSObject, ObservableObject, CBCentralManagerDelegate {
         case .poweredOn:
             print("central.state is .poweredOn")
             myCentral.scanForPeripherals(withServices: [heartRateServiceCBUUID])
-            print("test if it even gets to here")
         @unknown default:
             print("YIKES! SOMETHING WENT WRONG THAT SHOULDN'T HAVE. I DON'T KNOW WHAT'S GOING ON!")
         }
@@ -99,16 +98,20 @@ func getDocumentsDirectory() -> URL {
 class Logger {
 
     static var TextFile: URL? = {
-        guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
+        guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            print("failed to find the documentsDirectory")
+            return nil }
         let formatter = DateFormatter()
         formatter.dateFormat = "dd-MM-yyyy"
         let dateString = formatter.string(from: Date())
         let fileName = "\(dateString).txt"
+        print(documentsDirectory.appendingPathComponent(fileName))
         return documentsDirectory.appendingPathComponent(fileName)
     }()
 
     static func log(_ message: String, _ timestamp: String) {
         guard let textFile = TextFile else {
+            print("Failed to let textFile=TextFile")
             return
         }
         guard let data = (timestamp + ": " + message + "\n").data(using: String.Encoding.utf8) else { return }
@@ -117,9 +120,11 @@ class Logger {
             if let fileHandle = try? FileHandle(forWritingTo: textFile) {
                 fileHandle.seekToEndOfFile()
                 fileHandle.write(data)
+                print("data successfully written")
                 fileHandle.closeFile()
             }
         } else {
+            print("try? data.write")
             try? data.write(to: textFile, options: .atomicWrite)
         }
     }

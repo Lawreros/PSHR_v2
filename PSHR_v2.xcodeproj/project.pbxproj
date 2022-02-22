@@ -36,6 +36,7 @@
 
 /* Begin PBXFileReference section */
 		9113CF7127C162C600CF8F35 /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
+		9113CF7327C533B200CF8F35 /* PSHR-v2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "PSHR-v2-Info.plist"; sourceTree = SOURCE_ROOT; };
 		9157336927A59EBE0094CB1C /* PSHR_v2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PSHR_v2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9157336C27A59EBE0094CB1C /* PSHR_v2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PSHR_v2App.swift; sourceTree = "<group>"; };
 		9157336E27A59EBE0094CB1C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -96,6 +97,7 @@
 		9157336B27A59EBE0094CB1C /* PSHR_v2 */ = {
 			isa = PBXGroup;
 			children = (
+				9113CF7327C533B200CF8F35 /* PSHR-v2-Info.plist */,
 				9157336C27A59EBE0094CB1C /* PSHR_v2App.swift */,
 				9157336E27A59EBE0094CB1C /* ContentView.swift */,
 				9113CF7127C162C600CF8F35 /* BLEManager.swift */,
@@ -426,6 +428,8 @@
 				DEVELOPMENT_TEAM = 7T9789YLBV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PSHR-v2-Info.plist";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -455,6 +459,8 @@
 				DEVELOPMENT_TEAM = 7T9789YLBV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PSHR-v2-Info.plist";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
